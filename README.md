@@ -15,3 +15,7 @@
 - [RCOG Green-top 75: Cervical cerclage](https://www.rcog.org.uk/guidance/browse-all-guidance/green-top-guidelines/cervical-cerclage-green-top-guideline-no-75/)
 
 資料核對：2026-10-31。
+
+## 開發
+
+分流引擎位於 `app.js` 的 `/*ENGINE-START*/…/*ENGINE-END*/`（`PTL.assess`），測試：`node tests.cjs`。
