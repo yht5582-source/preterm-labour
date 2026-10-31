@@ -36,8 +36,8 @@ t('37+0 term PROM', A({ week: '37', day: '0' }).title.includes('足月'));
 t('21+0 periviable', A({ week: '21', day: '0' }).title.includes('周邊期'));
 t('21+0 no steroids', has(A({ week: '21', day: '0' }), '未達 22 週'));
 t('22+3 undecided resus no steroid offer', has(A({ week: '22', day: '3' }), '僅在家庭與團隊選擇積極新生兒復甦後'));
-t('22+3 resus yes consider steroid', has(A({ week: '22', day: '3', resus: 'yes' }), 'NICE consider'));
-t('23+2 resus yes mag', has(A({ week: '23', day: '2', resus: 'yes' }), '周邊期可個別討論'));
+t('22+3 resus yes consider steroid', has(A({ week: '22', day: '3', resus: 'yes' }), 'NICE 1.9.1'));
+t('23+2 resus yes mag', has(A({ week: '23', day: '2', resus: 'yes' }), 'NICE 1.10.1'));
 t('23+2 resus no no mag', !has(A({ week: '23', day: '2', resus: 'no' }), '硫酸鎂'));
 t('18+0 previable', A({ week: '18', day: '0' }).title.includes('生存期前'));
 
@@ -61,6 +61,9 @@ t('30 labour CL 15 mm', has(L({ week: '30', day: '0' }), 'CL ≤15 mm'));
 t('28 labour no CL 15 hint', !has(L({ week: '28', day: '0' }), 'CL ≤15 mm'));
 t('38 labour term', L({ week: '38', day: '0' }).title.includes('足月'));
 t('23 labour periviable', L({ week: '23', day: '0' }).title.includes('周邊期'));
+
+t('fFN >50 threshold', has(L({ week: '30', day: '0' }), '>50 ng/mL'));
+t('NICE intrapartum abx all preterm labour', has(L({ week: '31', day: '0' }), 'NICE NG195'));
 
 // short cervix
 const S = o => A({ scenario: 'short', week: '20', day: '0', ...o });
