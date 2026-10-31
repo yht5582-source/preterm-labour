@@ -167,7 +167,18 @@ if (typeof document !== 'undefined') {
     ['緊急環紮的禁忌？', '感染、活躍出血或宮縮', '羊膜完整', '無痛性擴張', 'NICE 對感染、出血或宮縮不建議緊急環紮；PPROM 亦是 RCOG 禁忌。'],
     ['21 週 PPROM 尚未選擇新生兒復甦？', '個別化諮商母胎風險與選項', '一律給鎂劑', '保證期待治療安全', 'SMFM #71 要求個別化諮商；類固醇與鎂劑待復甦照護合適且為病人所願。'],
     ['NICE PPROM 預防性抗生素特別避免？', 'Co-amoxiclav', '所有抗生素', 'GBS 分娩預防', 'NICE 不建議 co-amoxiclav 作為 PPROM 感染預防（NEC 風險）。'],
-    ['35 週 PPROM、母胎穩定？', '討論期待處置或分娩', '立即環紮', '照搬 29 週延遲分娩方案', 'ACOG 34–36+6 週可選擇期待處置或分娩，需討論風險。']
+    ['35 週 PPROM、母胎穩定？', '討論期待處置或分娩', '立即環紮', '照搬 29 週延遲分娩方案', 'ACOG 34–36+6 週可選擇期待處置或分娩，需討論風險。'],
+    // advanced (6th element = true)
+    ['28+0 週 PPROM 已完成 7 天 ampicillin + erythromycin，GBS 未知，第 12 天臨產？', '仍需依 GBS 狀態給予分娩期 GBS 預防', '延遲分娩抗生素已涵蓋，不需再給', '改給 co-amoxiclav 直到分娩', 'ACOG PB 217：延遲分娩抗生素不能取代分娩時的 GBS 預防；GBS 未知且早產即符合預防指徵。', true],
+    ['31 週、5 週前（26 週）已完成一個類固醇療程，羊膜完整，預計 7 天內生產？', '可考慮單次救援（rescue）療程', '每週重複一個療程直到 34 週', '已用過類固醇，不可再給', 'ACOG CO 713：<34 週、7 天內可能生產、前一療程距今 ≥14 天者可考慮單次救援療程；不建議每週或多次重複療程。', true],
+    ['35 週第 1 型糖尿病孕婦，羊膜完整疑似早產？', '晚期早產類固醇不宜常規使用（新生兒低血糖風險；ALPS 試驗排除）', '一律給予 betamethasone 兩劑', '改用 dexamethasone 4 劑即可避免低血糖', 'ALPS 試驗排除孕前糖尿病；ACOG/SMFM 提醒類固醇會加重母體高血糖並增加新生兒低血糖，不常規用於此族群。', true],
+    ['硫酸鎂神經保護中，膝反射消失、呼吸 10 次/分？', '停止輸注並給 calcium gluconate 1 g IV，抽血鎂濃度', '加快輸注至 2 g/h 維持神經保護', '改用 nifedipine 合併治療', '反射消失、呼吸抑制為鎂中毒徵象；停藥、給鈣劑並監測。Nifedipine 與鎂併用可能加重神經肌肉阻斷。', true],
+    ['Indomethacin 抑制宮縮為何通常限 <32 週且 ≤48 小時？', '胎兒動脈導管提早收縮及羊水過少風險', '會增加母體高血糖', '會造成新生兒低血鈣', 'NSAID 抑制前列腺素：≥32 週動脈導管收縮風險上升，延長使用亦致胎兒腎血流下降、羊水過少。', true],
+    ['羊膜完整疑似早產 30 週、GBS 陰性、無感染證據，是否常規給抗生素延長妊娠？', '不建議；ORACLE II 未見益處且兒童追蹤腦性麻痺增加', '建議 erythromycin 10 天', '建議 co-amoxiclav 7 天', 'NICE 不建議對羊膜完整的疑似早產常規給抗生素；只依 GBS 指徵給分娩預防。', true],
+    ['30 週 PPROM 且子宮頸環紮仍在位，無感染、未臨產？', '可考慮延後拆線約 48 小時以完成類固醇，若感染或臨產立即拆除', '環紮必須保留到 37 週', '立即拆線並同時抑制宮縮 7 天', 'RCOG GTG 75：23–34 週 PPROM 無感染或臨產時，可考慮延後 48 小時拆線；長期保留環紮可能增加感染，需個別討論。', true],
+    ['經陰道環紮後仍於中期流產，下一胎的環紮選項？', '討論經腹（transabdominal）環紮', '提早至 8 週再做經陰道環紮', '不需任何預防，只追蹤長度', 'RCOG GTG 75：先前經陰道環紮失敗者可考慮經腹環紮（孕前或孕早期）；分娩通常需剖腹產。', true],
+    ['未臨產、無併發症者，經陰道預防性環紮何時拆除？', '36+0–37+0 週', '28 週', '待自然臨產再拆除', 'RCOG GTG 75 與 ACOG：無併發症者於 36–37 週拆除經陰道環紮；臨產時應立即拆除以減少子宮頸撕裂。', true],
+    ['下列何者會使胎兒纖維連接蛋白（fFN）檢測不可靠？', '24 小時內性行為或明顯陰道出血', '單胞胎妊娠', '頭位胎兒', '性行為、出血、內診或潤滑劑可能造成偽陽性；應在內診前採檢並由檢驗結果結合臨床判讀。', true]
   ];
 
   function shuffle(a) {
@@ -181,7 +192,7 @@ if (typeof document !== 'undefined') {
     root.innerHTML = items.map((x, i) => {
       const opts = isCase ? x.slice(2, 5) : x.slice(1, 4);
       const order = shuffle([0, 1, 2]);
-      return `<article class="${isCase ? 'case' : 'q'}"><small>${isCase ? 'CASE' : 'QUESTION'} ${String(i + 1).padStart(2, '0')}</small><h3>${esc(x[0])}</h3>${isCase ? `<p>${esc(x[1])}</p>` : ''}<div>${order.map((j, k) => `<button type="button" class="option" aria-pressed="false" data-correct="${j === 0}">${'ABC'[k]} · ${esc(opts[j])}</button>`).join('')}</div><div class="feedback" hidden></div></article>`;
+      return `<article class="${isCase ? 'case' : 'q'}"><small>${isCase ? 'CASE' : 'QUESTION'} ${String(i + 1).padStart(2, '0')}${x[6] === true || (!isCase && x[5] === true) ? ' · <span class="adv">高階</span>' : ''}</small><h3>${esc(x[0])}</h3>${isCase ? `<p>${esc(x[1])}</p>` : ''}<div>${order.map((j, k) => `<button type="button" class="option" aria-pressed="false" data-correct="${j === 0}">${'ABC'[k]} · ${esc(opts[j])}</button>`).join('')}</div><div class="feedback" hidden></div></article>`;
     }).join('');
     root.querySelectorAll('article').forEach((el, i) => el.querySelectorAll('.option').forEach(btn => btn.addEventListener('click', () => {
       el.querySelectorAll('.option').forEach(b => { b.classList.toggle('active', b === btn); b.setAttribute('aria-pressed', b === btn); });
