@@ -181,47 +181,129 @@ if (typeof document !== 'undefined') {
     ['下列何者會使胎兒纖維連接蛋白（fFN）檢測不可靠？', '24 小時內性行為或明顯陰道出血', '單胞胎妊娠', '頭位胎兒', '性行為、出血、內診或潤滑劑可能造成偽陽性；應在內診前採檢並由檢驗結果結合臨床判讀。', true]
   ];
 
+  const caseTags = [['PPROM', 'c-pprom'], ['疑似早產', 'c-labour'], ['短子宮頸', 'c-cervix'], ['羊膜外露', 'c-cervix'], ['PPROM', 'c-pprom'], ['PPROM', 'c-pprom']];
+
   function shuffle(a) {
     const r = a.slice();
     for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
     return r;
   }
 
+  // treatment-window chart, 16–42 weeks
+  const W0 = 16, W1 = 42;
+  const pct = w => ((Math.min(Math.max(w, W0), W1) - W0) / (W1 - W0)) * 100;
+  const windows = [
+    ['類固醇', '#f0b27a', [[22, 24, 'weak'], [24, 34, 'strong'], [34, 37, 'weak']]],
+    ['硫酸鎂', '#7fd1c7', [[23, 24, 'weak'], [24, 30, 'strong'], [30, 34, 'weak']]],
+    ['抑制宮縮', '#9dbcf0', [[24, 26, 'weak'], [26, 34, 'strong']]],
+    ['緊急環紮', '#f0a093', [[16, 28, 'weak']]],
+    ['短頸預防', '#c7b4ee', [[16, 24, 'strong']]]
+  ];
+  const bands = [[16, 22, '生存期前', .05], [22, 24, '周邊', .12], [24, 34, '早產介入窗', .2], [34, 37, '晚期', .12], [37, 42, '足月', .05]];
+  function chart(ga, label) {
+    const seg = (a, b, k, c) => `<span class="seg ${k}" style="--c:${c};left:${pct(a)}%;width:${pct(b) - pct(a)}%"></span>`;
+    const marker = ga == null ? '' : `<span class="marker" data-label="${label}" style="left:calc(${pct(ga)}% - 1px)"></span>`;
+    return `<div class="win${ga == null ? '' : ' has-marker'}">
+      <div class="bands">${bands.map(([a, b, t, o]) => `<b style="left:${pct(a)}%;width:${pct(b) - pct(a)}%;background:rgba(255,255,255,${o})">${pct(b) - pct(a) > 9 ? t : ''}</b>`).join('')}</div>
+      <div class="grid-area">${windows.map(([n, c, s]) => `<div class="row"><span class="lab">${n}</span><span class="track">${s.map(([a, b, k]) => seg(a, b, k, c)).join('')}</span></div>`).join('')}
+        <div style="position:absolute;top:0;bottom:0;left:calc(var(--lab) + 10px);right:0">${marker}</div></div>
+      <div class="axis">${[16, 20, 24, 28, 32, 36, 40].map(w => `<span style="left:${pct(w)}%">${w}</span>`).join('')}</div>
+      <div class="legend"><span><i></i>建議（offer）</span><span><i class="weak"></i>考慮／討論</span><span>週數</span></div>
+    </div>`;
+  }
+  $('#hero-chart').innerHTML = chart(null);
+
+  // cases and quiz
+  const score = { right: 0, done: 0 };
+  function updateScore() {
+    const arts = [...document.querySelectorAll('#questions .qcard')];
+    const done = arts.filter(a => a.dataset.answer);
+    const right = done.filter(a => a.dataset.answer === 'right');
+    $('#score-right').textContent = right.length;
+    $('#score-done').textContent = done.length;
+    $('#score-bar').style.width = `${(right.length / arts.length) * 100}%`;
+  }
+
   function make(items, selector, isCase) {
     const root = $(selector);
     root.innerHTML = items.map((x, i) => {
       const opts = isCase ? x.slice(2, 5) : x.slice(1, 4);
+      const adv = !isCase && x[5] === true;
       const order = shuffle([0, 1, 2]);
-      return `<article class="${isCase ? 'case' : 'q'}"><small>${isCase ? 'CASE' : 'QUESTION'} ${String(i + 1).padStart(2, '0')}${x[6] === true || (!isCase && x[5] === true) ? ' · <span class="adv">高階</span>' : ''}</small><h3>${esc(x[0])}</h3>${isCase ? `<p>${esc(x[1])}</p>` : ''}<div>${order.map((j, k) => `<button type="button" class="option" aria-pressed="false" data-correct="${j === 0}">${'ABC'[k]} · ${esc(opts[j])}</button>`).join('')}</div><div class="feedback" hidden></div></article>`;
+      const tag = isCase ? `<span class="tag ${caseTags[i][1]}">${caseTags[i][0]}</span>` : (adv ? '<span class="tag adv">高階</span>' : '<span class="tag">基礎</span>');
+      return `<article class="qcard" data-level="${adv ? 'adv' : 'basic'}"><div class="meta"><span class="no">${isCase ? 'CASE' : 'Q'} ${String(i + 1).padStart(2, '0')}</span>${tag}</div><h3>${esc(x[0])}</h3>${isCase ? `<p class="vig">${esc(x[1])}</p>` : ''}<div class="opts">${order.map((j, k) => `<button type="button" class="option" aria-pressed="false" data-correct="${j === 0}"><span class="k">${'ABC'[k]}</span><span>${esc(opts[j])}</span></button>`).join('')}</div><div class="feedback" hidden></div></article>`;
     }).join('');
-    root.querySelectorAll('article').forEach((el, i) => el.querySelectorAll('.option').forEach(btn => btn.addEventListener('click', () => {
-      el.querySelectorAll('.option').forEach(b => { b.classList.toggle('active', b === btn); b.setAttribute('aria-pressed', b === btn); });
+    root.querySelectorAll('.qcard').forEach((el, i) => el.querySelectorAll('.option').forEach(btn => btn.addEventListener('click', () => {
       const right = btn.dataset.correct === 'true';
+      el.querySelectorAll('.option').forEach(b => {
+        b.classList.remove('right', 'wrong');
+        b.setAttribute('aria-pressed', b === btn);
+      });
+      btn.classList.add(right ? 'right' : 'wrong');
+      if (!right) el.querySelector('.option[data-correct="true"]').classList.add('right');
+      el.dataset.answer = right ? 'right' : 'wrong';
       const f = el.querySelector('.feedback');
       f.hidden = false;
-      f.classList.toggle('right', right);
-      f.textContent = (right ? '答對了。' : '請再核對。') + (isCase ? items[i][5] : items[i][4]);
+      f.classList.toggle('ok', right);
+      f.innerHTML = `<b>${right ? '答對了。' : '再想想：正確答案已標示。'}</b> ${esc(isCase ? items[i][5] : items[i][4])}`;
+      if (!isCase) updateScore();
     })));
+  }
+
+  function applyFilter() {
+    const v = document.querySelector('input[name="qfilter"]:checked').value;
+    document.querySelectorAll('#questions .qcard').forEach(a => { a.hidden = v !== 'all' && a.dataset.level !== v; });
   }
 
   make(cases, '#case-list', true);
   make(quiz, '#questions', false);
-  $('#reset').addEventListener('click', () => { make(quiz, '#questions', false); $('#quiz').scrollIntoView(); });
+  document.querySelectorAll('input[name="qfilter"]').forEach(r => r.addEventListener('change', applyFilter));
+  $('#reset').addEventListener('click', () => { make(quiz, '#questions', false); applyFilter(); updateScore(); $('#quiz').scrollIntoView(); });
 
+  // pathway form
   const form = $('#form');
+  const range = $('#ga-range');
   function render() {
     const d = Object.fromEntries(new FormData(form));
     const ga = Number(d.week) + Number(d.day) / 7;
+    if (d.week !== '' && Number(d.week) >= 16 && Number(d.week) <= 42) range.value = d.week;
+    $('#ga-big').textContent = `${d.week || '–'}+${d.day || '–'}`;
     form.querySelector('[data-for="short"]').hidden = d.scenario !== 'short';
     form.querySelector('[data-for="resus"]').hidden = !(ga >= 20 && ga < 24) || d.scenario === 'short';
     const r = PTL.assess(d);
     const box = $('#result');
     box.classList.toggle('urgent', r.tone === 'urgent');
-    if (!r.ok) { box.innerHTML = `<p class="eyebrow">TEACHING PATHWAY</p><h3>${r.title}</h3><p>${r.points[0]}</p>`; return; }
-    box.innerHTML = `<p class="eyebrow">TEACHING PATHWAY · ${r.label}</p><h3>${esc(r.title)}</h3>${r.alerts.length ? `<ul class="alerts">${r.alerts.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}<ul>${r.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul><p>以原始指引與院內母胎醫學／新生兒團隊流程核對。</p>`;
+    $('#r-ga').textContent = r.ok ? `${r.label} 週` : '—';
+    $('#r-tag').textContent = r.tone === 'urgent' ? '紅旗 · 優先處理母胎安全' : 'TEACHING PATHWAY';
+    $('#r-title').textContent = r.ok ? r.title.replace(/^優先處理母胎安全｜/, '') : r.title;
+    $('#r-chart').innerHTML = r.ok ? chart(Math.min(r.ga, W1), r.label) : '';
+    $('#r-chart').hidden = !r.ok;
+    $('#r-alerts').innerHTML = (r.alerts || []).map(p => `<li>${esc(p)}</li>`).join('');
+    $('#r-points').innerHTML = r.points.map(p => `<li>${esc(p)}</li>`).join('');
   }
+  form.addEventListener('click', e => {
+    const b = e.target.closest('[data-step]');
+    if (!b) return;
+    const [name, delta] = b.dataset.step.split(':');
+    let w = Number(form.week.value) || 16, d = Number(form.day.value) || 0;
+    if (name === 'week') w += Number(delta);
+    else { d += Number(delta); if (d > 6) { d = 0; w++; } if (d < 0) { d = 6; w--; } }
+    w = Math.min(42, Math.max(16, w));
+    form.week.value = w; form.day.value = d;
+    render();
+  });
+  range.addEventListener('input', () => { form.week.value = range.value; render(); });
   form.addEventListener('submit', e => { e.preventDefault(); render(); $('#result').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   render();
+
+  // theme toggle
+  const root = document.documentElement;
+  try { const t = localStorage.getItem('ptl-theme'); if (t) root.dataset.theme = t; } catch (e) { /* storage unavailable */ }
+  $('#theme').addEventListener('click', () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('ptl-theme', root.dataset.theme); } catch (e) { /* storage unavailable */ }
+  });
 }
