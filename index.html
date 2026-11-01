@@ -192,6 +192,27 @@ input[type=range]{width:100%;margin:14px 0 0;accent-color:var(--teal)}
 .r-points li::before{counter-increment:p;content:counter(p);position:absolute;left:0;top:11px;width:24px;height:24px;border-radius:50%;background:var(--teal-soft);color:var(--teal);font-size:12px;font-weight:900;display:grid;place-items:center}
 .r-foot{margin:14px 0 0;font-size:13px;color:var(--ink-3)}
 
+/* mind map */
+.mm-tools{display:flex;gap:8px;margin-bottom:20px}
+.mm{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 136px minmax(0,1fr);column-gap:44px}
+#mm-links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+#mm-links path{fill:none;stroke:var(--c);stroke-width:2;opacity:.55}
+.mm-side{position:relative;min-width:0}
+.mm-col{font-size:18px;margin-bottom:12px}
+.mm-center{position:relative;align-self:center;background:var(--navy);color:var(--on-navy);border:1px solid var(--navy-2);border-radius:var(--r);padding:18px 10px;text-align:center;font:700 19px/1.4 var(--serif);box-shadow:var(--shadow)}
+.mm-center small{display:block;margin-top:10px;font:500 12.5px/1.6 var(--sans);color:var(--on-navy-2)}
+.mm-branch{margin-bottom:10px}
+.mm-head{display:block;position:relative;width:100%;text-align:left;padding:10px 34px 10px 14px;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;background:var(--cs);cursor:pointer}
+.mm-head::after{content:"▸";position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--c);font-size:20px;line-height:1}
+.mm-head[aria-expanded="true"]{border-radius:10px 10px 0 0}
+.mm-head[aria-expanded="true"]::after{content:"▾"}
+.mm-t{display:block;font-weight:700;font-size:15.5px;line-height:1.45;color:var(--c)}
+.mm-s{display:block;font-size:13px;line-height:1.5;color:var(--ink-2)}
+.mm-leaves{list-style:none;margin:0;padding:4px 14px;background:var(--paper);border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px}
+.mm-leaves li{display:grid;grid-template-columns:minmax(0,7.5em) minmax(0,1fr);gap:10px;padding:7px 0;font-size:14px;line-height:1.6;border-bottom:1px dashed var(--line)}
+.mm-leaves li:last-child{border-bottom:0}
+.mm-leaves b{font-variant-numeric:tabular-nums}
+
 /* cases + quiz */
 .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 .qcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);display:flex;flex-direction:column}
@@ -237,12 +258,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .c-labour{--c:var(--teal);--cs:var(--teal-soft)}
 .c-pprom{--c:var(--blue);--cs:var(--blue-soft)}
 .c-cervix{--c:var(--apricot-ink);--cs:var(--apricot-soft)}
+.c-flag{--c:var(--rose);--cs:var(--rose-soft)}
+.c-drug{--c:var(--green);--cs:var(--green-soft)}
 
 @media (max-width:960px){
   .hero .wrap,.tool{grid-template-columns:1fr}
   .result{position:static}
   .paths{grid-template-columns:1fr}
   .cards{grid-template-columns:1fr}
+  .mm{grid-template-columns:minmax(0,1fr);row-gap:18px}
+  #mm-links{display:none}
+  .mm-center{order:-1}
 }
 @media (max-width:640px){
   .wrap{padding:0 16px}
@@ -267,7 +293,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#"><i>PT</i><span>PRETERM · CLINICAL LEARNING</span></a>
-    <nav aria-label="主選單"><a href="#overview">核心概念</a><a href="#pathway">互動分流</a><a href="#cases">病例</a><a href="#quiz">考題</a><a href="#sources">來源</a></nav>
+    <nav aria-label="主選單"><a href="#overview">核心概念</a><a href="#pathway">互動分流</a><a href="#map">心智圖</a><a href="#cases">病例</a><a href="#quiz">考題</a><a href="#sources">來源</a></nav>
     <button class="theme" id="theme" type="button" aria-label="切換深色模式">◐</button>
   </div>
 </header>
@@ -379,16 +405,24 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   </div>
 </section>
 
-<section id="cases" class="sec">
+<section id="map" class="sec">
   <div class="wrap">
-    <div class="sec-head"><div><p class="eyebrow">03 / Case library</p><h2>六個示範病例</h2></div><p class="muted">選出最適合的下一步，答案順序每次隨機。</p></div>
+    <div class="sec-head"><div><p class="eyebrow">03 / Mind map</p><h2>診斷與處置心智圖</h2></div><p class="muted">一頁看完全部路徑，點分支展開細節。內容與上方分流工具使用相同規則，顏色對應路徑。</p></div>
+    <div class="mm-tools"><button id="mm-open" class="reset" type="button">全部展開</button><button id="mm-close" class="reset" type="button">全部收合</button></div>
+    <div class="mm" id="mm-wrap"><svg id="mm-links" aria-hidden="true"></svg><div class="mm-side" id="mm-dx"></div><div class="mm-center" id="mm-center">早產風險<small>羊膜破了嗎？<br>臨產了嗎？<br>感染或無痛性擴張？</small></div><div class="mm-side" id="mm-tx"></div></div>
+  </div>
+</section>
+
+<section id="cases" class="sec alt">
+  <div class="wrap">
+    <div class="sec-head"><div><p class="eyebrow">04 / Case library</p><h2>六個示範病例</h2></div><p class="muted">選出最適合的下一步，答案順序每次隨機。</p></div>
     <div id="case-list" class="cards"></div>
   </div>
 </section>
 
-<section id="quiz" class="sec alt">
+<section id="quiz" class="sec">
   <div class="wrap">
-    <div class="sec-head"><div><p class="eyebrow">04 / Knowledge check</p><h2>20 題臨床考題</h2></div><p class="muted">10 題基礎、10 題高階（類固醇救援療程、鎂中毒、抑制宮縮藥理、環紮處置等）。作答後顯示解釋與出處。</p></div>
+    <div class="sec-head"><div><p class="eyebrow">05 / Knowledge check</p><h2>20 題臨床考題</h2></div><p class="muted">10 題基礎、10 題高階（類固醇救援療程、鎂中毒、抑制宮縮藥理、環紮處置等）。作答後顯示解釋與出處。</p></div>
     <div class="quiz-bar">
       <div class="seg" role="radiogroup" aria-label="題目篩選"><label><input type="radio" name="qfilter" value="all" checked><span>全部 20</span></label><label><input type="radio" name="qfilter" value="basic"><span>基礎 10</span></label><label><input type="radio" name="qfilter" value="adv"><span>高階 10</span></label></div>
       <div class="score"><span>答對 <b id="score-right">0</b> / 已答 <b id="score-done">0</b></span><span class="bar"><i id="score-bar"></i></span><button id="reset" class="reset" type="button">重做</button></div>
@@ -397,9 +431,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   </div>
 </section>
 
-<section id="sources" class="sec">
+<section id="sources" class="sec alt">
   <div class="wrap">
-    <div class="sec-head"><div><p class="eyebrow">05 / Source desk</p><h2>原始指引</h2></div><p class="muted">資料核對：2026-10-31。</p></div>
+    <div class="sec-head"><div><p class="eyebrow">06 / Source desk</p><h2>原始指引</h2></div><p class="muted">資料核對：2026-10-31。</p></div>
     <ul class="src">
       <li><a href="https://www.nice.org.uk/guidance/ng25/chapter/Recommendations"><span class="org">NICE</span><span><b>NG25：Preterm labour and birth ↗</b><span>診斷、類固醇、鎂劑、抑制宮縮、緊急環紮</span></span></a></li>
       <li><a href="https://www.nice.org.uk/guidance/ng195/chapter/prevention-and-risk-reduction"><span class="org">NICE</span><span><b>NG195：Neonatal infection ↗</b><span>早產臨產的分娩期抗生素</span></span></a></li>
@@ -414,6 +448,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 </main>
 
 <footer><div class="wrap"><span>PRETERM · CLINICAL LEARNING　/　醫療人員教學用途</span><span>非個別醫囑 · 指引核對 2026-10-31</span></div></footer>
-<script src="app.js?v=2.0.1" defer></script>
+<script src="app.js?v=2.1.0" defer></script>
 </body>
 </html>

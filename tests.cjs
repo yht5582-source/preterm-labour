@@ -92,5 +92,57 @@ t('18 dilation no steroids', !has(D({ week: '18' }), '類固醇'));
 // escaping-safe output types
 t('points are strings', A({}).points.every(p => typeof p === 'string' && p.length));
 
+// mind map: structure, and each threshold agrees with the engine
+const mapCtx = {};
+vm.runInNewContext(src.slice(src.indexOf('/*MAP-START*/'), src.indexOf('/*MAP-END*/')) + ';this.M=PTL_MAP;', mapCtx);
+const M = mapCtx.M;
+const branch = t2 => M.dx.concat(M.tx).find(b => b.t === t2);
+const leaf = (t2, k) => { const l = branch(t2).l.find(x => x[0] === k); return l ? l[1] : ''; };
+const css = fs.readFileSync(__dirname + '/index.html', 'utf8');
+M.dx.concat(M.tx).forEach(b => {
+  t(`map ${b.t} has colour class`, css.includes(`.${b.c}{`));
+  t(`map ${b.t} has leaves`, b.l.length > 0 && b.l.every(x => x.length === 2 && x[0] && x[1]));
+  t(`map ${b.t} unique keys`, new Set(b.l.map(x => x[0])).size === b.l.length);
+});
+t('map section linked', css.includes('href="#map"') && css.includes('id="map"'));
+const both = (name, mapText, sub, engine) => { t(`map ${name}`, mapText.includes(sub)); t(`engine ${name}`, engine); };
+both('steroid <22', leaf('產前類固醇', '<22+0'), '不建議', has(A({ week: '21', day: '6' }), '未達 22 週'));
+both('steroid 22 needs resus', leaf('產前類固醇', '22+0–23+6'), '積極新生兒復甦', has(A({ week: '22', day: '0', resus: 'yes' }), 'NICE 1.9.1'));
+both('steroid 24–33 offer', leaf('產前類固醇', '24+0–33+6'), 'NICE offer', has(A({ week: '33', day: '6' }), 'NICE offer'));
+both('steroid 34–35 NICE', leaf('產前類固醇', '34+0–35+6'), 'NICE 可考慮', has(A({ week: '35', day: '6' }), 'NICE 34+0–35+6 週可考慮'));
+both('steroid ACOG diabetes', leaf('產前類固醇', '34+0–36+6'), '孕前糖尿病', has(A({ week: '36', day: '3' }), 'ACOG 34+0–36+6') && has(A({ week: '35', day: '1' }), '孕前糖尿病'));
+both('mag 23 resus', leaf('硫酸鎂神經保護', '23+0–23+6'), 'NICE 1.10.1', has(A({ week: '23', day: '0', resus: 'yes' }), 'NICE 1.10.1'));
+both('mag 24–29 offer', leaf('硫酸鎂神經保護', '24+0–29+6'), 'NICE offer', has(A({ week: '29', day: '6' }), 'NICE offer）'));
+both('mag 30–33 consider', leaf('硫酸鎂神經保護', '30+0–33+6'), 'NICE consider', has(A({ week: '30', day: '0' }), 'NICE consider'));
+both('tocolysis 24–25', leaf('抑制宮縮', '24+0–25+6'), 'nifedipine', has(L({ week: '24', day: '0' }), '24+0–25+6 週可考慮 nifedipine'));
+both('tocolysis 26–33', leaf('抑制宮縮', '26+0–33+6'), 'oxytocin receptor antagonist', has(L({ week: '26', day: '0' }), 'oxytocin receptor antagonist'));
+both('tocolysis ≥34', leaf('抑制宮縮', '≥34+0'), '不建議', has(L({ week: '34', day: '0' }), '34 週後不建議'));
+both('PPROM tocolysis', leaf('抑制宮縮', '不適用'), 'PPROM 不建議常規', has(A({}), 'PPROM 不建議常規抑制宮縮'));
+both('latency abx', leaf('抗生素', 'PPROM 延遲分娩'), 'ACOG ampicillin + erythromycin 7 天', has(A({}), 'ACOG ampicillin + erythromycin 7 天'));
+both('co-amoxiclav', leaf('抗生素', '避免'), 'NEC', has(A({}), 'NEC'));
+both('periviable abx', leaf('抗生素', '周邊期 PPROM'), 'SMFM #71', has(A({ week: '21', day: '0' }), 'SMFM #71'));
+both('NG195', leaf('抗生素', '早產臨產（分娩期）'), 'NG195', has(L({ week: '31', day: '0' }), 'NG195'));
+both('PPROM ≥34 GBS', leaf('抗生素', '34+0 週後 PPROM'), 'GBS 未知或陽性', has(A({ week: '35', day: '0' }), 'GBS 未知或陽性'));
+both('PPROM deliver 34', leaf('PPROM 依孕週處置', '24+0–33+6'), '34+0 週分娩', has(A({}), '於 34+0 週分娩'));
+both('PPROM 34–36', leaf('PPROM 依孕週處置', '34+0–36+6'), '37+0', has(A({ week: '35', day: '0' }), '期待處置至 37+0'));
+both('PPROM <20', leaf('PPROM 依孕週處置', '<20+0'), '肺發育不全', has(A({ week: '18', day: '0' }), '肺發育不全'));
+both('PPROM periviable', leaf('PPROM 依孕週處置', '20+0–23+6'), '不保證', has(A({ week: '20', day: '0' }), '不保證'));
+both('CL ≤20', leaf('短子宮頸預防', '無早產史，CL ≤20 mm'), 'SMFM #70', has(S({ length: '20' }), 'SMFM #70 建議'));
+both('CL 21–25', leaf('短子宮頸預防', '無早產史，CL 21–25 mm'), '共同決策', has(S({ length: '21' }), '可共同決策考慮') && has(S({ length: '25' }), '可共同決策考慮'));
+both('CL 10–25 no cerclage', leaf('短子宮頸預防', '無早產史，CL 10–25 mm'), '不常規環紮', has(S({ length: '10' }), '不建議 CL 10–25 mm 常規環紮'));
+both('CL <10', leaf('短子宮頸預防', '無早產史，CL <10 mm'), '環紮', has(S({ length: '9' }), 'CL <10 mm'));
+both('hx CL <25', leaf('短子宮頸預防', '有早產史，CL <25 mm'), '陰道黃體素或環紮', has(S({ history: 'yes', length: '24' }), '陰道黃體素或環紮'));
+both('hx CL ≥25', leaf('短子宮頸預防', '有早產史，CL ≥25 mm'), '序列追蹤', has(S({ history: 'yes', length: '25' }), '序列追蹤'));
+both('twins', leaf('短子宮頸預防', '多胞胎'), '不建議常規', has(S({ multiple: 'on' }), '不建議常規使用'));
+both('≥24 wk', leaf('短子宮頸預防', '≥24 週'), '證據窗', has(S({ week: '24' }), '證據窗'));
+both('history cerclage', leaf('子宮頸環紮', '病史指示'), '≥3 次', has(S({ history: 'yes', length: '30' }), '≥3 次'));
+both('rescue window', leaf('子宮頸環紮', '緊急'), '16+0–27+6', has(D({ week: '27', day: '6' }), '16+0–27+6') && has(D({ week: '28', day: '0' }), '不在 NICE 緊急環紮'));
+both('short def', leaf('子宮頸問題：有擴張嗎？', '短子宮頸'), '>25 mm', has(S({ length: '26' }), '不符合短子宮頸定義'));
+both('CL15', leaf('疑似早產：臨產了嗎？', '≥30+0 週 TVUS'), '≤15 mm', has(L({ week: '30', day: '0' }), 'CL ≤15 mm'));
+both('fFN', leaf('疑似早產：臨產了嗎？', '或 fFN'), '>50 ng/mL', has(L({ week: '30', day: '0' }), '>50 ng/mL'));
+both('infection flag', leaf('紅旗先處理', '疑似羊膜內感染'), '廣效抗生素', has(inf, '廣效抗生素'));
+both('flag keeps steroids', leaf('紅旗先處理', '注意'), '類固醇與硫酸鎂', has(inf, 'NICE offer') && has(inf, '硫酸鎂'));
+both('previable no drugs', leaf('孕週定錨', '<20+0'), '不建議類固醇或硫酸鎂', has(A({ week: '18', day: '0' }), '不建議類固醇或硫酸鎂'));
+
 console.log(`${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

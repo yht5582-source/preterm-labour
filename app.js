@@ -143,6 +143,104 @@ const PTL = (() => {
 if (typeof module !== 'undefined') module.exports = PTL;
 /*ENGINE-END*/
 
+/*MAP-START*/
+// Leaves restate rules already in PTL and in the verified quiz explanations; tests.cjs cross-checks them. Update by hand when a threshold changes.
+const PTL_MAP = {
+  dx: [
+    { t: '紅旗先處理', s: '母胎安全優先於延長妊娠', c: 'c-flag', l: [
+      ['疑似羊膜內感染', '廣效抗生素並評估分娩；不以期待處置、抑制宮縮或環紮延長妊娠'],
+      ['明顯出血', '評估胎盤早剝／前置胎盤與母體血行動力學；抑制宮縮與緊急環紮皆不適用'],
+      ['胎兒窘迫', '依產科評估加速分娩，不為延長妊娠延誤處置'],
+      ['已臨產', '不環紮、不採延長妊娠的期待策略；依孕週準備早產兒照護'],
+      ['注意', '紅旗不取消依孕週評估類固醇與硫酸鎂']
+    ] },
+    { t: '孕週定錨', s: '同一情境，孕週決定處置', c: 'c-drug', l: [
+      ['<20+0', '生存期前：個別化諮商，不建議類固醇或硫酸鎂'],
+      ['20+0–23+6', '周邊期：與母胎醫學及新生兒科討論復甦計畫與家庭意願'],
+      ['24+0–33+6', '早產介入窗：類固醇、神經保護、短期抑制宮縮、轉院'],
+      ['34+0–36+6', '晚期早產：生產時機共同決策'],
+      ['≥37+0', '循足月流程']
+    ] },
+    { t: 'PPROM：羊膜破了嗎？', s: '37 週前、臨產前破水', c: 'c-pprom', l: [
+      ['第一步', '無菌鴨嘴檢查有無羊水積聚；避免常規數位內診'],
+      ['未見積聚', 'IGFBP-1 或 PAMG-1，綜合判讀，陽性也不單獨決定處置；不用 nitrazine'],
+      ['感染判斷', '結合臨床、CRP、白血球與胎心；單一檢驗不能確認或排除']
+    ] },
+    { t: '疑似早產：臨產了嗎？', s: '羊膜完整，37 週前規律宮縮伴子宮頸變化', c: 'c-labour', l: [
+      ['同時評估', '胎心、感染、出血'],
+      ['≥30+0 週 TVUS', 'CL ≤15 mm 視為早產臨產，>15 mm 不太可能（NICE）'],
+      ['或 fFN', '>50 ng/mL 為陽性（NICE）'],
+      ['fFN 干擾', '24 小時內性行為、明顯出血、內診、潤滑劑；應在內診前採檢']
+    ] },
+    { t: '子宮頸問題：有擴張嗎？', s: '病史、長度與無痛性擴張並不等同', c: 'c-cervix', l: [
+      ['短子宮頸', '無症狀，經陰道超音波量測；>25 mm 不符合短子宮頸定義'],
+      ['無痛性擴張／羊膜外露', '先確認羊膜未破，排除感染、出血、宮縮與胎兒異常'],
+      ['短子宮頸且 CL <10 mm', '先排除無痛性擴張']
+    ] }
+  ],
+  tx: [
+    { t: '產前類固醇', s: '依孕週與新生兒照護目標', c: 'c-drug', l: [
+      ['<22+0', '不建議'],
+      ['22+0–23+6', '家庭與團隊選擇積極新生兒復甦後才討論（NICE 1.9.1；SMFM #71）'],
+      ['24+0–33+6', '建議提供（NICE offer；ACOG）'],
+      ['34+0–35+6', 'NICE 可考慮'],
+      ['34+0–36+6', 'ACOG：7 天內可能生產且未曾用過，給單一療程；孕前糖尿病避免'],
+      ['重複療程', 'NICE：<34+0 週、前療程 >7 天、48 小時內極可能生產，單次，總共 ≤2 療程。ACOG：<34 週、7 天內可能生產、前療程 >14 天（臨床需要時最早 7 天）']
+    ] },
+    { t: '硫酸鎂神經保護', s: '已臨產或預計 24 小時內生產', c: 'c-drug', l: [
+      ['23+0–23+6', '積極復甦計畫下與家庭討論（NICE 1.10.1）'],
+      ['24+0–29+6', '建議提供（NICE offer）'],
+      ['30+0–33+6', '可考慮（NICE consider；ACOG 至 <32 週）'],
+      ['監測', '至少每 4 小時記錄脈搏、血壓、呼吸與膝反射；寡尿或腎衰竭時減量或停藥'],
+      ['中毒', '膝反射消失、呼吸抑制 → 停輸注，10% calcium gluconate 10 mL（1 g）IV，抽血鎂濃度']
+    ] },
+    { t: '抑制宮縮', s: '短期爭取類固醇療程或轉院', c: 'c-labour', l: [
+      ['24+0–25+6', 'NICE 可考慮 nifedipine'],
+      ['26+0–33+6', 'NICE 提供 nifedipine；禁忌時用 oxytocin receptor antagonist'],
+      ['療程', '約 48 小時，不做維持性抑制宮縮'],
+      ['≥34+0', '不建議'],
+      ['不適用', '感染、出血或胎兒窘迫；PPROM 不建議常規使用'],
+      ['Indomethacin', '通常限 <32 週且 ≤48 小時：胎兒動脈導管收縮、羊水過少']
+    ] },
+    { t: '抗生素', s: '目的不同，不要混用', c: 'c-pprom', l: [
+      ['PPROM 延遲分娩', 'NICE erythromycin 10 天（或 penicillin）；ACOG ampicillin + erythromycin 7 天'],
+      ['避免', 'Co-amoxiclav（NEC 風險）'],
+      ['周邊期 PPROM', 'SMFM #71：期待處置自 24 週建議，20+0–23+6 週可考慮'],
+      ['早產臨產（分娩期）', 'NICE NG195 對所有早產臨產者提供；ACOG 依 GBS 狀態（未知或陽性）'],
+      ['療程結束後才臨產', 'GBS 未知仍需分娩期預防（ACOG CO 797）'],
+      ['羊膜完整、無感染', '不用抗生素延長妊娠（ORACLE II）；不同於分娩期抗生素'],
+      ['34+0 週後 PPROM', 'GBS 未知或陽性給分娩期預防；不照搬 <34 週延遲分娩方案']
+    ] },
+    { t: 'PPROM 依孕週處置', s: '有紅旗或已臨產則不採期待', c: 'c-pprom', l: [
+      ['<20+0', '個別化諮商期待處置或終止妊娠照護；說明感染、出血與肺發育不全風險'],
+      ['20+0–23+6', '母胎及新生兒團隊個別化諮商；不保證期待處置可改善存活'],
+      ['24+0–33+6', '無禁忌可期待處置，監測體溫、宮縮與胎心；ACOG：無其他指徵者 34+0 週分娩'],
+      ['34+0–36+6', '期待至 37+0 週或立即分娩皆合理，共同決策（ACOG PB 217；NICE）'],
+      ['≥37+0', '足月 PROM 流程：GBS、感染、胎兒狀態與引產時機']
+    ] },
+    { t: '短子宮頸預防', s: '單胎、16–24 週經陰道超音波', c: 'c-cervix', l: [
+      ['無早產史，CL ≤20 mm', '陰道黃體素（SMFM #70 建議）'],
+      ['無早產史，CL 21–25 mm', '共同決策考慮陰道黃體素；NICE 對 CL <25 mm 即提供'],
+      ['無早產史，CL 10–25 mm', '不常規環紮；不建議 17-OHPC 或子宮托'],
+      ['無早產史，CL <10 mm', '可共同決策考慮環紮，轉介母胎醫學'],
+      ['有早產史，CL <25 mm', 'NICE 提供陰道黃體素或環紮的選擇；ACOG／RCOG 可超音波指示環紮'],
+      ['有早產史，CL ≥25 mm', '序列追蹤子宮頸長度，可討論陰道黃體素'],
+      ['多胞胎', '效益未證實，不建議常規使用，轉介母胎醫學'],
+      ['≥24 週', '超過預防性介入證據窗，轉介專科確認量測與症狀'],
+      ['不再使用', '17-OHPC 已撤市']
+    ] },
+    { t: '子宮頸環紮', s: '四種時機與拆線', c: 'c-cervix', l: [
+      ['病史指示', '≥3 次中期流產或早產，12–14 週討論（RCOG）'],
+      ['超音波指示', '單胎、自發性早產史、24 週前 CL <25 mm（RCOG ≤25 mm）'],
+      ['緊急', '16+0–27+6 週專科評估（NICE）；感染、活躍出血或宮縮為禁忌，PPROM 亦是 RCOG 禁忌'],
+      ['經腹', '先前經陰道環紮失敗者討論，孕前或孕早期放置，之後剖腹產（RCOG）'],
+      ['拆線', '未臨產者 36+1–37+0 週（RCOG）；計畫產前剖腹產可延至手術時；早產臨產時應拆除'],
+      ['PPROM 且環紮在位', '24–34 週無感染或臨產，可考慮延後 48 小時拆線；感染或臨產時立即拆除（RCOG）']
+    ] }
+  ]
+};
+/*MAP-END*/
+
 if (typeof document !== 'undefined') {
   const $ = s => document.querySelector(s);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -259,6 +357,38 @@ if (typeof document !== 'undefined') {
   make(quiz, '#questions', false);
   document.querySelectorAll('input[name="qfilter"]').forEach(r => r.addEventListener('change', applyFilter));
   $('#reset').addEventListener('click', () => { make(quiz, '#questions', false); applyFilter(); updateScore(); $('#quiz').scrollIntoView(); });
+
+  // mind map
+  const mapBranch = (b, side, i) => `<div class="mm-branch ${b.c}"><button type="button" class="mm-head" aria-expanded="false" aria-controls="mm-${side}${i}"><span class="mm-t">${esc(b.t)}</span><span class="mm-s">${esc(b.s)}</span></button><ul class="mm-leaves" id="mm-${side}${i}" hidden>${b.l.map(([k, x]) => `<li><b>${esc(k)}</b><span>${esc(x)}</span></li>`).join('')}</ul></div>`;
+  $('#mm-dx').innerHTML = `<h3 class="mm-col">辨識與診斷</h3>${PTL_MAP.dx.map((b, i) => mapBranch(b, 'dx', i)).join('')}`;
+  $('#mm-tx').innerHTML = `<h3 class="mm-col">處置與治療</h3>${PTL_MAP.tx.map((b, i) => mapBranch(b, 'tx', i)).join('')}`;
+  const mmWrap = $('#mm-wrap');
+  function drawMapLinks() {
+    const svg = $('#mm-links');
+    const box = mmWrap.getBoundingClientRect();
+    const mid = $('#mm-center').getBoundingClientRect();
+    if (getComputedStyle(svg).display === 'none') return;
+    const y0 = mid.top + mid.height / 2 - box.top;
+    svg.innerHTML = [...mmWrap.querySelectorAll('.mm-branch')].map(b => {
+      const r = b.querySelector('.mm-head').getBoundingClientRect();
+      const left = r.right <= mid.left;
+      const x0 = (left ? mid.left : mid.right) - box.left;
+      const x1 = (left ? r.right : r.left) - box.left;
+      const y1 = r.top + r.height / 2 - box.top;
+      const cx = (x0 + x1) / 2;
+      return `<path class="${b.classList[1]}" d="M${x0} ${y0}C${cx} ${y0} ${cx} ${y1} ${x1} ${y1}"/>`;
+    }).join('');
+  }
+  const setBranch = (h, open) => { h.setAttribute('aria-expanded', open); $(`#${h.getAttribute('aria-controls')}`).hidden = !open; };
+  const setAll = open => { mmWrap.querySelectorAll('.mm-head').forEach(h => setBranch(h, open)); drawMapLinks(); };
+  mmWrap.addEventListener('click', e => {
+    const h = e.target.closest('.mm-head');
+    if (h) { setBranch(h, h.getAttribute('aria-expanded') !== 'true'); drawMapLinks(); }
+  });
+  $('#mm-open').addEventListener('click', () => setAll(true));
+  $('#mm-close').addEventListener('click', () => setAll(false));
+  if (window.ResizeObserver) new ResizeObserver(drawMapLinks).observe(mmWrap); else addEventListener('resize', drawMapLinks);
+  drawMapLinks();
 
   // pathway form
   const form = $('#form');

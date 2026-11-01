@@ -1,6 +1,6 @@
 # 早產・早期破水・子宮頸閉鎖不全｜臨床教學
 
-繁體中文互動網站：早產、早期破水（PPROM）及子宮頸閉鎖不全的診斷與孕週導向處置教學，附六個示範病例與二十題考題（10 基礎＋10 高階）。
+繁體中文互動網站：早產、早期破水（PPROM）及子宮頸閉鎖不全的診斷與孕週導向處置教學，附診斷與處置心智圖、六個示範病例與二十題考題（10 基礎＋10 高階）。
 
 網站：https://yht5582-source.github.io/preterm-labour/
 
@@ -18,4 +18,4 @@
 
 ## 開發
 
-分流引擎位於 `app.js` 的 `/*ENGINE-START*/…/*ENGINE-END*/`（`PTL.assess`），測試：`node tests.cjs`。
+分流引擎位於 `app.js` 的 `/*ENGINE-START*/…/*ENGINE-END*/`（`PTL.assess`），心智圖內容位於 `/*MAP-START*/…/*MAP-END*/`（門檻變更時須手動同步），測試：`node tests.cjs`。
